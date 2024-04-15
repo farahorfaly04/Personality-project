@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .chat-container { display: flex; flex-direction: column; max-width: 600px; margin: auto; }
+        .chat-box { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: scroll; margin-bottom: 10px; }
+        .chat-input { padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box" aria-label="Chat box"></div>
+        <textarea id="user-input" class="chat-input" rows="3" placeholder="Type your message here..." aria-label="Input for chat messages"></textarea>
+        <button onclick="sendMessage()" aria-label="Send message">Send</button>
+    </div>
+    <script>
+        let history = [];
+
+        function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const userInput = inputField.value;
+            inputField.value = '';  // Clear the input field
+            chatBox.innerHTML += '<div><strong>You:</strong> ' + userInput + '</div>';
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_input: userInput,
+                    history: history
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += '<div><strong>Sales:</strong> ' + data.answer + '</div>';
+                history = data.history;  // Update the chat history
+                chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
+            })
+            .catch(error => {
+                console.error('Error during fetch:', error);
+                chatBox.innerHTML += '<div>Error communicating with the chat service.</div>';
+            });
+        }
+    </script>
+</body>
+</html>
