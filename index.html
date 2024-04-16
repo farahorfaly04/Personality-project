@@ -39,7 +39,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                chatBox.innerHTML += '<div><strong>Sales:</strong> ' + data.answer + '</div>';
+                var text = data.answer.replace(/\n/g, '<br>');
+                chatBox.innerHTML += '<div><strong>Sales:</strong> ' + text + '</div>';
                 history = data.history;  // Update the chat history
                 chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
             })
